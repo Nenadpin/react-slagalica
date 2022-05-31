@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "./img/skocko.png";
 import "./App.css";
 import skocko from "./img/1.png";
@@ -24,29 +24,66 @@ for (let j = 0; j < 4; j++) {
 }
 
 function App() {
+  const [timer, setTimer] = useState(60);
   const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    if (count > 0) {
+      const vreme = setInterval(() => {
+        updateTime();
+      }, 1000);
+      return () => clearInterval(vreme);
+    }
+  }, [timer]);
+
+  function updateTime() {
+    if (timer === 0) {
+      setCount(24);
+    } else {
+      setTimer(timer - 1);
+    }
+  }
+
   function klik(a) {
-    if (count === 25) {
+    if (count === 24) {
+      setTimer(0);
       window.location.reload(false);
     } else {
       pokusaj.push(a);
       setCount(count + 1);
+      if (count === 0) setTimer(59);
+    }
+
+    if (pokusaj.length % 4 === 0 && pokusaj.length >= 4) {
+      if (
+        pokusaj[count] === pocetak[3] &&
+        pokusaj[count - 1] === pocetak[2] &&
+        pokusaj[count - 2] === pocetak[1] &&
+        pokusaj[count - 3] === pocetak[0]
+      ) {
+        setCount(24);
+        setTimer(0);
+      }
     }
   }
 
-  function ups(){
-    if (count>0 && count%4!==0){
-      setCount(count-1)
-      pokusaj.pop()
-    }else if(count===24){
-      window.location.reload(false)
+  function ups() {
+    if (count > 0 && count % 4 !== 0) {
+      setCount(count - 1);
+      pokusaj.pop();
+    } else if (count === 24) {
+      window.location.reload(false);
     }
   }
   return (
     <div className="App">
       <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" onClick={()=>ups()} />
+        <img
+          src={logo}
+          className={count > 0 && count !== 24 ? "App-logo" : "Applogo"}
+          alt="logo"
+          onClick={() => ups()}
+        />
         <div className="zadatak">
           <button onClick={() => klik(1)}>
             <img src={skocko} alt="" />
@@ -76,32 +113,32 @@ function App() {
               <div className="Odgovor">
                 <div className="red">
                   {count >= 4 ? (
-                    <Odgovor zadatak={pocetak} proba={pokusaj} endOfGame={setCount} />
+                    <Odgovor zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
                 <div className="red">
                   {count >= 8 ? (
-                    <Odgovor2 zadatak={pocetak} proba={pokusaj} endOfGame={setCount}/>
+                    <Odgovor2 zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
                 <div className="red">
                   {count >= 12 ? (
-                    <Odgovor3 zadatak={pocetak} proba={pokusaj} endOfGame={setCount}/>
+                    <Odgovor3 zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
                 <div className="red">
                   {count >= 16 ? (
-                    <Odgovor4 zadatak={pocetak} proba={pokusaj} endOfGame={setCount}/>
+                    <Odgovor4 zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
                 <div className="red">
                   {count >= 20 ? (
-                    <Odgovor5 zadatak={pocetak} proba={pokusaj} endOfGame={setCount}/>
+                    <Odgovor5 zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
                 <div className="red">
                   {count === 24 ? (
-                    <Odgovor6 zadatak={pocetak} proba={pokusaj} endOfGame={setCount}/>
+                    <Odgovor6 zadatak={pocetak} proba={pokusaj} />
                   ) : null}
                 </div>
               </div>
@@ -109,7 +146,11 @@ function App() {
           </div>
         ) : null}
         <div>
-          {count >= 24 ? <Resenje text={count} zadato={pocetak} /> : null}
+          {count === 0 ? <p>Nova igra?</p> : null}
+          {timer < 60 && count !== 24 ? (
+            <p>Preostalo vreme... {timer} s</p>
+          ) : null}
+          {count === 24 ? <Resenje text={count} zadato={pocetak} /> : null}
         </div>
       </div>
     </div>

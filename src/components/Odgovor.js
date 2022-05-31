@@ -21,9 +21,6 @@ function Odgovor(props) {
       t = t + 1;
       pitanje[j] = 0;
       temp[j] = 0;
-      if(t===4){
-        props.endOfGame(24)
-      }
     }
   }
 
